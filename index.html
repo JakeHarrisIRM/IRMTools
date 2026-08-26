@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<title>Iron Mountain Tools</title>
+<style>
+  :root {
+    --bg-color: #f3f3f3;
+    --text-color: #1a1a1a;
+    --panel-bg: #ffffff;
+    --border-color: #d5d5d5;
+    --border-strong: #8a8a8a;
+    --readonly-bg: #ececec;
+    --readonly-text: #444444;
+    --muted-text: #777777;
+    --label-strong: #444444;
+    --accent: #0078d4;
+    --accent-text: #ffffff;
+    --not-found-color: #a4262c;
+    --found-color: #107c10;
+    --partial-color: #b06a00;
+    --partial-bg: #fff4e0;
+    --btn-grad-top: #fdfdfd;
+    --btn-grad-bottom: #e8e8e8;
+    --btn-hover-top: #ffffff;
+    --btn-hover-bottom: #f0f0f0;
+    --btn-active-bg: #dddddd;
+    --serial-block-border: #e2e2e2;
+    --match-item-border: #f0f0f0;
+    --spinner-track: #d5d5d5;
+    --overlay-bg: rgba(0, 0, 0, 0.15);
+    --navbar-bg: #e9e9e9;
+    --nav-card-bg: #ffffff;
+    --nav-card-active-bg: #0078d4;
+    --nav-card-active-text: #ffffff;
+    --success-bg: #dff6dd;
+    --success-border: #9fd89b;
+    --success-text: #0b5c0b;
+    --error-bg: #fde7e9;
+    --error-border: #e8a5ab;
+    --error-text: #8a1a24;
+  }
+
+  body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #e8e8e8;
+    --panel-bg: #2b2b2b;
+    --border-color: #444444;
+    --border-strong: #666666;
+    --readonly-bg: #383838;
+    --readonly-text: #cccccc;
+    --muted-text: #a0a0a0;
+    --label-strong: #cfcfcf;
+    --accent: #3a96dd;
+    --accent-text: #ffffff;
+    --not-found-color: #ff6b6b;
+    --found-color: #6bcf6b;
+    --partial-color: #ffb84d;
+    --partial-bg: #3a2f1a;
+    --btn-grad-top: #3a3a3a;
+    --btn-grad-bottom: #2f2f2f;
+    --btn-hover-top: #454545;
+    --btn-hover-bottom: #383838;
+    --btn-active-bg: #262626;
+    --serial-block-border: #3d3d3d;
+    --match-item-border: #383838;
+    --spinner-track: #4a4a4a;
+    --overlay-bg: rgba(0, 0, 0, 0.4);
+    --navbar-bg: #252525;
+    --nav-card-bg: #2b2b2b;
+    --nav-card-active-bg: #3a96dd;
+    --nav-card-active-text: #1a1a1a;
+    --success-bg: #163a17;
+    --success-border: #2f6b2f;
+    --success-text: #8fe08f;
+    --error-bg: #3a1418;
+    --error-border: #7a2b33;
+    --error-text: #ff9aa4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 13px;
+    background: var(--bg-color);
+    margin: 0;
+    color: var(--text-color);
+    transition: background 0.15s ease, color 0.15s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3 { margin: 0; }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--label-strong);
+  }
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    font-size: 13px;
+    background: var(--panel-bg);
+    color: var(--text-color);
+    font-family: inherit;
+  }
+  input[readonly] {
+    background: var(--readonly-bg);
+    color: var(--readonly-text);
+  }
+  textarea { resize: vertical; min-height: 90px; font-family: "Consolas", "Courier New", monospace; }
+  button {
+    padding: 6px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    background: linear-gradient(var(--btn-grad-top), var(--btn-grad-bottom));
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  button:hover { background: linear-gradient(var(--btn-hover-top), var(--btn-hover-bottom)); }
+  button:active { background: var(--btn-active-bg); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+  button.primary:hover { filter: brightness(1.08); }
+  hr { border: none; border-top: 1px solid var(--border-color); margin: 16px 0; }
+
+  .icon-btn {
+    padding: 5px 8px;
+    font-size: 16px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.2px; }
+
+  /* ---------- Navbar ---------- */
+  .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--navbar-bg);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .nav-card {
+    flex: 1 1 160px;
+    max-width: 260px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--nav-card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color);
+    text-align: left;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .nav-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: var(--nav-card-bg);
+  }
+  .nav-card:active { transform: scale(0.98); }
+  .nav-card .icon { width: 22px; height: 22px; }
+  .nav-card.active {
+    background: var(--nav-card-active-bg);
+    color: var(--nav-card-active-text);
+    border-color: var(--nav-card-active-bg);
+  }
+
+  /* ---------- Page content ---------- */
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px;
+  }
+  .page { display: none; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ---------- Alert banner ---------- */
+  #alertBanner {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    max-width: 560px;
+    width: calc(100% - 40px);
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--success-border);
+    background: var(--success-bg);
+    color: var(--success-text);
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #alertBanner.show { display: flex; }
+  #alertBanner.error {
+    border-color: var(--error-border);
+    background: var(--error-bg);
+    color: var(--error-text);
+  }
+  #alertBanner .alertCloseBtn {
+    background: none;
+    border: none;
+    color: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 0 4px;
+    cursor: pointer;
+  }
+
+  /* ---------- Shared card / section styling ---------- */
+  .card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .row { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .field-block { flex: 1; }
+  .hint { font-size: 12px; color: var(--muted-text); }
+  .status { font-size: 12px; color: var(--muted-text); margin-top: 6px; }
+  .not-found { color: var(--not-found-color); font-weight: 600; }
+  .found-label { color: var(--found-color); font-weight: 600; }
+  .partial-badge {
+    display: inline-block;
+    background: var(--partial-bg);
+    color: var(--partial-color);
+    font-weight: 600;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .partial-note { font-size: 12px; color: var(--partial-color); margin-bottom: 6px; }
+
+  /* ---------- Segmented control (mode toggle) ---------- */
+  .mode-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .mode-toggle button {
+    border: none;
+    border-radius: 0;
+    background: var(--panel-bg);
+    padding: 6px 16px;
+  }
+  .mode-toggle button + button { border-left: 1px solid var(--border-strong); }
+  .mode-toggle button.active { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+  .mode-toggle button:hover:not(.active) { background: var(--btn-hover-bottom); }
+
+  .multi-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .multi-actions .hint { color: var(--muted-text); font-size: 12px; }
+
+  #results {
+    border: 1px solid var(--border-color);
+    background: var(--panel-bg);
+    border-radius: 4px;
+    padding: 12px;
+    min-height: 110px;
+  }
+  #results.empty { color: var(--muted-text); display: flex; align-items: center; justify-content: center; }
+  .result-row { display: flex; padding: 4px 0; }
+  .result-row .label { width: 110px; font-weight: 600; color: var(--label-strong); }
+  .results-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .results-toolbar .status { margin-top: 0; }
+  .results-view-toggle { margin-bottom: 0; }
+  .results-view-toggle button { padding: 5px 12px; font-size: 12px; }
+  #exportStatus:empty { display: none; }
+  #exportStatus {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: var(--readonly-bg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .export-success { color: var(--found-color); font-weight: 600; }
+  .export-error { color: var(--not-found-color); font-weight: 600; }
+
+  .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .grid-card {
+    border: 1px solid var(--serial-block-border);
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .grid-card-header { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .grid-card-body { font-size: 12px; color: var(--text-color); display: flex; flex-direction: column; gap: 2px; }
+  .grid-card-body.not-found { color: var(--not-found-color); }
+  .grid-card-file { color: var(--muted-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .grid-card button { margin-top: 4px; padding: 4px 8px; font-size: 12px; align-self: flex-start; }
+  .not-found-card { opacity: 0.85; }
+  .grid-card-header-row { display: flex; align-items: center; gap: 2px; }
+
+  .results-basic { display: flex; flex-direction: column; }
+  .basic-row { font-size: 12.5px; padding: 5px 2px; border-bottom: 1px solid var(--match-item-border); }
+  .basic-row:last-child { border-bottom: none; }
+
+  .serial-block { border: 1px solid var(--serial-block-border); border-radius: 4px; padding: 10px; margin-bottom: 10px; }
+  .serial-block:last-child { margin-bottom: 0; }
+  .serial-block h3 { margin: 0 0 8px 0; font-size: 13px; }
+  .match-item { padding: 6px 0; border-top: 1px solid var(--match-item-border); }
+  .match-item:first-of-type { border-top: none; }
+  .single-heading { margin: 0 0 8px 0; font-size: 13px; }
+
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin-left: 4px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: var(--panel-bg);
+    color: var(--accent);
+    font-size: 12px;
+    line-height: 1;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .info-btn:hover { background: var(--btn-hover-bottom); }
+  .job-number-value { display: flex; align-items: center; }
+
+  .spinner-wrap { display: flex; align-items: center; gap: 10px; color: var(--muted-text); }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 3px solid var(--spinner-track);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Modal overlay (settings / job info) ---------- */
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+  }
+  .info-overlay.open { display: flex; }
+  .info-panel {
+    width: 340px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    padding: 14px;
+  }
+  .info-panel.wide { width: 420px; }
+  .info-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .info-panel-header h2 { font-size: 14px; }
+
+  .job-info-summary { font-size: 12px; color: var(--muted-text); margin-bottom: 8px; }
+  .job-info-list { display: flex; flex-direction: column; }
+  .job-info-row { display: flex; justify-content: space-between; padding: 5px 2px; border-bottom: 1px solid var(--match-item-border); font-size: 13px; }
+  .job-info-row:last-child { border-bottom: none; }
+  .job-info-count { font-weight: 600; color: var(--label-strong); }
+
+  /* ---------- Settings ---------- */
+  .settings-section { margin-bottom: 16px; }
+  .settings-section:last-child { margin-bottom: 0; }
+  .settings-section h3 { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted-text); margin-bottom: 8px; }
+  .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+  .settings-row label { margin-bottom: 0; font-weight: normal; }
+  .settings-note { font-size: 11.5px; color: var(--muted-text); margin-top: 4px; line-height: 1.4; }
+  .settings-footer {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    font-size: 10.5px;
+    color: var(--muted-text);
+    opacity: 0.6;
+    text-align: center;
+  }
+
+  .switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-strong); border-radius: 20px; transition: 0.15s; }
+  .switch .slider::before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: #ffffff; border-radius: 50%; transition: 0.15s; }
+  .switch input:checked + .slider { background-color: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+
+  /* ---------- Empty / info states ---------- */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted-text);
+  }
+  .empty-state .icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--muted-text); }
+  .empty-state h2 { font-size: 15px; color: var(--text-color); margin-bottom: 6px; }
+  .empty-state p { margin: 0 0 14px 0; font-size: 13px; }
+
+  /* ---------- Label printer specific ---------- */
+  .printer-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--readonly-bg);
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--muted-text);
+  }
+  .printer-status-bar strong { color: var(--text-color); }
+
+  .align-options { display: flex; gap: 16px; margin-bottom: 14px; }
+  .align-options label { font-weight: normal; display: flex; align-items: center; gap: 6px; margin-bottom: 0; }
+
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .checkbox-row label { font-weight: normal; margin-bottom: 0; }
+
+  .template-card-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .template-card {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px 14px;
+    cursor: pointer;
+    background: var(--panel-bg);
+  }
+  .template-card:hover { border-color: var(--accent); }
+  .template-card.active { border-color: var(--accent); background: var(--readonly-bg); }
+  .template-card h4 { font-size: 13px; margin-bottom: 3px; }
+  .template-card p { margin: 0; font-size: 12px; color: var(--muted-text); }
+
+  .preset-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .preset-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; }
+  .preset-row label { flex: 1; font-weight: normal; margin-bottom: 0; }
+  .preset-row .preset-controls { display: flex; gap: 4px; }
+  .preset-row .preset-controls button { padding: 2px 7px; font-size: 11px; }
+
+  .manage-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 6px; }
+  .manage-row span { flex: 1; font-size: 13px; }
+  .manage-row .manage-controls { display: flex; gap: 4px; }
+  .manage-row .manage-controls button { padding: 2px 7px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+  <div id="alertBanner">
+    <span id="alertBannerText"></span>
+    <button class="alertCloseBtn" id="alertBannerClose">&times;</button>
+  </div>
+
+  <div class="topbar">
+    <h1>Iron Mountain Tools</h1>
+    <button class="icon-btn" id="settingsBtn" title="Settings">&#9881;</button>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <button class="nav-card active" data-page="serialFinder">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>Serial Finder</span>
+    </button>
+    <button class="nav-card" data-page="labelPrinter">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      <span>Label Printer</span>
+    </button>
+  </nav>
+
+  <main>
+    <!-- ================= Serial Finder page ================= -->
+    <section id="page-serialFinder" class="page active">
+      <label>Search mode</label>
+      <div class="mode-toggle">
+        <button id="singleModeBtn" class="active">Single search</button>
+        <button id="multiModeBtn">Multiple search</button>
+      </div>
+
+      <div id="singleSearchSection">
+        <div class="row">
+          <div class="field-block">
+            <label for="serialInput">Serial number</label>
+            <input type="text" id="serialInput" placeholder="e.g. A437905" />
+          </div>
+          <button id="searchBtn" style="align-self: flex-end;">Search</button>
+        </div>
+      </div>
+
+      <div id="multiSearchSection" style="display: none;">
+        <label for="rawDataInput">Paste serial numbers (up to 50)</label>
+        <textarea id="rawDataInput" placeholder="Paste serials here, e.g.&#10;A450349&#10;A450350&#10;A450351&#10;&#10;or: A450349, A450350, A450351&#10;or: A450349 A450350 A450351"></textarea>
+        <div class="hint" style="margin: 4px 0 10px 0;">
+          Accepted formats: one serial per line, separated by spaces, or separated by commas (not mixed together).
+        </div>
+        <div class="multi-actions" style="justify-content: flex-end;">
+          <button id="rawSearchBtn">Search</button>
+        </div>
+      </div>
+
+      <div id="results" class="empty">Enter a serial number and click Search.</div>
+    </section>
+
+    <!-- ================= Label Printer page ================= -->
+    <section id="page-labelPrinter" class="page">
+
+      <!-- No printer configured -->
+      <div id="noPrinterState" class="empty-state" style="display: none;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <h2>No printer set up yet</h2>
+        <p>Head to Settings to detect or choose a Zebra printer before you can print labels.</p>
+        <button class="primary" id="goToSettingsBtn">Open Settings</button>
+      </div>
+
+      <!-- Printer configured: label printing UI -->
+      <div id="labelPrinterMain" style="display: none;">
+        <div class="printer-status-bar">
+          <span>Printing to: <strong id="activePrinterName">—</strong></span>
+          <button id="labelSettingsShortcut">Change</button>
+        </div>
+
+        <label>Label type</label>
+        <div class="mode-toggle">
+          <button id="customLabelModeBtn" class="active">Custom Label</button>
+          <button id="templatesModeBtn">Templates</button>
+          <button id="customTemplatesModeBtn">Custom Templates</button>
+        </div>
+
+        <!-- Custom Label -->
+        <div id="customLabelSection">
+          <div class="card">
+            <div class="row">
+              <div class="field-block">
+                <label for="labelLine1">Line 1 (required)</label>
+                <input type="text" id="labelLine1" placeholder="Text to print" />
+                <div class="hint" id="line1Hint">Single-line label: 1–20 characters.</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="field-block">
+                <label for="labelLine2">Line 2 (optional)</label>
+                <input type="text" id="labelLine2" placeholder="Leave blank for a single-line label" />
+                <div class="hint">Adding text here (or checking Total Asset Count below) makes this a multi-line label.</div>
+              </div>
+            </div>
+
+            <div class="checkbox-row">
+              <input type="checkbox" id="assetCountCheckbox" />
+              <label for="assetCountCheckbox">Total Asset Count? (appends "1 of N", "2 of N", ... to Line 2)</label>
+            </div>
+
+            <label>Alignment</label>
+            <div class="align-options">
+              <label><input type="radio" name="labelAlign" value="left" checked /> Left</label>
+              <label><input type="radio" name="labelAlign" value="center" /> Center</label>
+              <label><input type="radio" name="labelAlign" value="right" /> Right</label>
+            </div>
+
+            <div class="row">
+              <div class="field-block" style="max-width: 140px;">
+                <label for="labelQty">Quantity</label>
+                <input type="number" id="labelQty" min="1" max="200" value="1" />
+              </div>
+              <button class="primary" id="printCustomLabelBtn" style="align-self: flex-end;">Print</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates -->
+        <div id="templatesSection" style="display: none;">
+          <div class="template-card-list" id="templateCardList">
+            <div class="template-card active" data-template="failed">
+              <h4>Failed Device Label</h4>
+              <p>Job &amp; CID line + Failed to Start / Failed to Wipe / No Power / MDM Lock / BIOS Lock checkboxes.</p>
+            </div>
+            <div class="template-card" data-template="missing">
+              <h4>Missing Components Label</h4>
+              <p>Job &amp; CID line + Missing HDD / Missing RAM checkboxes + a blank "Other:" line.</p>
+            </div>
+            <div class="template-card" data-template="removed">
+              <h4>Removed Components Label</h4>
+              <p>Prints a 2-label bundle per unit: a removed-parts checklist plus a small "HDD belongs to" tag.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row">
+              <div class="field-block">
+                <label for="templateJobCid">Job ID / CID (optional)</label>
+                <input type="text" id="templateJobCid" placeholder="Max 15 characters" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field-block" style="max-width: 140px;">
+                <label for="templateQty">Quantity</label>
+                <input type="number" id="templateQty" min="1" max="200" value="1" />
+              </div>
+              <button class="primary" id="printTemplateLabelBtn" style="align-self: flex-end;">Print</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Templates -->
+        <div id="customTemplatesSection" style="display: none;">
+          <div class="card">
+            <div class="row" style="justify-content: space-between;">
+              <label style="margin-bottom: 0;">Select templates to print</label>
+              <button id="manageTemplatesBtn">Manage Templates</button>
+            </div>
+            <div class="preset-list" id="presetList"></div>
+            <div class="row">
+              <div class="field-block" style="max-width: 140px;">
+                <label for="customTemplateQty">Quantity (per template)</label>
+                <input type="number" id="customTemplateQty" min="1" max="200" value="1" />
+              </div>
+              <button class="primary" id="printCustomTemplatesBtn" style="align-self: flex-end;">Print</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= Manage Templates modal ================= -->
+  <div class="info-overlay" id="manageTemplatesOverlay">
+    <div class="info-panel wide" id="manageTemplatesPanel">
+      <div class="info-panel-header">
+        <h2>Manage Custom Templates</h2>
+        <button class="icon-btn" id="manageTemplatesCloseBtn" title="Close">&times;</button>
+      </div>
+      <div id="manageTemplatesList"></div>
+      <hr />
+      <label for="newTemplateInput">Add new template (1–20 characters)</label>
+      <div class="row">
+        <div class="field-block">
+          <input type="text" id="newTemplateInput" placeholder="e.g. Wiped" />
+        </div>
+        <button id="addTemplateBtn">Add</button>
+      </div>
+      <div class="status" id="manageTemplatesStatus"></div>
+    </div>
+  </div>
+
+  <!-- ================= Job info modal (Serial Finder) ================= -->
+  <div class="info-overlay" id="jobInfoOverlay">
+    <div class="info-panel" id="jobInfoPanel">
+      <div class="info-panel-header">
+        <h2 id="jobInfoTitle">Job info</h2>
+        <button class="icon-btn" id="jobInfoCloseBtn" title="Close">&times;</button>
+      </div>
+      <div id="jobInfoBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= Settings modal ================= -->
+  <div class="info-overlay" id="settingsOverlay">
+    <div class="info-panel wide" id="settingsPanel">
+      <div class="info-panel-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="settingsCloseBtn" title="Close">&times;</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <div class="settings-row">
+          <label for="darkModeToggle">Dark mode</label>
+          <label class="switch">
+            <input type="checkbox" id="darkModeToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Serial Finder</h3>
+        <label for="directoryInput">Working directory</label>
+        <div class="row" style="margin-bottom: 4px;">
+          <div class="field-block">
+            <input type="text" id="directoryInput" readonly placeholder="No directory selected yet" />
+          </div>
+          <button id="browseBtn">Browse&hellip;</button>
+        </div>
+        <div class="settings-note">Used by Serial Finder to scan spreadsheets. May be reused by future tools.</div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Label Printer</h3>
+        <div class="row" style="margin-bottom: 4px;">
+          <div class="field-block">
+            <input type="text" id="printerNameDisplay" readonly placeholder="No printer detected" />
+          </div>
+          <button id="redetectPrinterBtn">Auto-detect</button>
+        </div>
+        <label for="printerSelect" style="margin-top: 8px;">Choose a different printer</label>
+        <div class="row">
+          <div class="field-block">
+            <select id="printerSelect">
+              <option value="">Loading printers&hellip;</option>
+            </select>
+          </div>
+          <button id="usePrinterSelectBtn">Use</button>
+        </div>
+        <div class="hint">Or type an exact printer name manually:</div>
+        <div class="row">
+          <div class="field-block">
+            <input type="text" id="printerManualInput" placeholder="e.g. ZDesigner ZD421-203dpi ZPL" />
+          </div>
+          <button id="usePrinterManualBtn">Use</button>
+        </div>
+        <div class="status" id="printerSettingsStatus"></div>
+      </div>
+
+      <div class="settings-note">Window size and position are also remembered automatically between launches.</div>
+
+      <div class="settings-footer">App created by jake.harris@ironmountain.com for ACT &amp; IRM</div>
+    </div>
+  </div>
+
+  <script src="renderer/app.js"></script>
+  <script src="renderer/serialFinder.js"></script>
+  <script src="renderer/labelPrinter.js"></script>
+</body>
+</html>
