@@ -28,6 +28,18 @@ the same navbar later.
 npm start
 ```
 
+This works fine, but it leaves a command prompt window open behind the app
+the whole time. For a cleaner launch with no visible console at all,
+double-click **`Start IRMTools.vbs`** instead (or make a desktop/taskbar
+shortcut to it) — it runs the exact same `npm start` under the hood, just
+with the console window hidden. Only the app window itself appears.
+
+If double-clicking the `.vbs` file doesn't seem to do anything, run
+`npm start` (or `start.bat`) directly in a terminal instead so you can see
+what error is happening — the hidden launcher suppresses output along with
+the window, which is fine once things are working but unhelpful while
+troubleshooting.
+
 The app reopens on whichever page (Serial Finder or Label Printer) you had
 open last time you closed it.
 
@@ -121,6 +133,10 @@ instead.
 
 ## Files
 
+- `Start IRMTools.vbs` — double-click launcher that runs the app with no
+  visible console window (see "Running it" above).
+- `start.bat` — plain `npm start` wrapper with a visible console, useful for
+  troubleshooting.
 - `main.js` — Electron main process: window/config management and all IPC
   handlers for both tools.
 - `preload.js` — exposes the IPC API to the renderer safely.
