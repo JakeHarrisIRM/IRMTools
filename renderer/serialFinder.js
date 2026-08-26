@@ -552,4 +552,13 @@
   }
 
   rawSearchBtn.addEventListener('click', runRawSearch);
+
+  // Ctrl+Enter submits the search - plain Enter still just inserts a
+  // newline, since that's needed for pasting/typing multiple lines.
+  rawDataInput.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault();
+      runRawSearch();
+    }
+  });
 })();

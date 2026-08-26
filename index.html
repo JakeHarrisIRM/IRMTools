@@ -257,6 +257,7 @@
   .hint { font-size: 12px; color: var(--muted-text); }
   .status { font-size: 12px; color: var(--muted-text); margin-top: 6px; }
   .not-found { color: var(--not-found-color); font-weight: 600; }
+  .required-asterisk { color: var(--not-found-color); font-weight: 700; }
   .found-label { color: var(--found-color); font-weight: 600; }
   .partial-badge {
     display: inline-block;
@@ -474,7 +475,7 @@
   }
   .template-card:hover { border-color: var(--accent); }
   .template-card.active { border-color: var(--accent); background: var(--readonly-bg); }
-  .template-card h4 { font-size: 13px; margin-bottom: 3px; }
+  .template-card h4 { font-size: 13px; margin: 0 0 3px 0; }
   .template-card p { margin: 0; font-size: 12px; color: var(--muted-text); }
 
   .preset-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
@@ -586,7 +587,7 @@
           <div class="card">
             <div class="row">
               <div class="field-block">
-                <label for="labelLine1">Line 1 (required)</label>
+                <label for="labelLine1">Line 1 <span class="required-asterisk">*</span></label>
                 <input type="text" id="labelLine1" placeholder="Text to print" />
                 <div class="hint" id="line1Hint">Single-line label: 1–20 characters.</div>
               </div>
