@@ -2,5 +2,7 @@ node_modules/
 config.json
 exports/
 package-lock.json
+release/
+search-cache.json
 *.log
 .DS_Store
